@@ -31,6 +31,8 @@ import org.tensorflow.lite.task.audio.classifier.AudioClassifier
 import org.tensorflow.lite.task.core.BaseOptions
 import java.io.File
 import java.io.FileOutputStream
+import java.text.SimpleDateFormat
+import java.util.Date
 import java.util.concurrent.ScheduledThreadPoolExecutor
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicBoolean
@@ -133,7 +135,7 @@ class AudioClassificationHelper(
         var inferenceTime = SystemClock.uptimeMillis()
 
         //
-        val buffer = tensorAudio.tensorBuffer.buffer.array()
+        val buffer = tensorAudio.tensorBuffer.buffer.array().copyOf()
 
         val output = classifier.classify(tensorAudio)
         inferenceTime = SystemClock.uptimeMillis() - inferenceTime
@@ -143,13 +145,13 @@ class AudioClassificationHelper(
 
         results.forEach {
 //            it.index == 38 &&
-            if (it.score >= 0.75f && !isRecording.get()) {
-
-                isRecording.set(true)
-                stopHandler.postDelayed(10 * 1000) {
-                    stopWrite()
-                }
-            }
+//            if (it.score >= 0.75f && !isRecording.get()) {
+//
+//                isRecording.set(true)
+//                stopHandler.postDelayed(10 * 1000) {
+//                    stopWrite()
+//                }
+//            }
         }
 
         if (isRecording.get()) {
@@ -159,7 +161,9 @@ class AudioClassificationHelper(
 
 //    private var audioFile = File(context.filesDir, "a.pcm")
 
-    private fun createAudioFile() = File(context.filesDir, System.currentTimeMillis().toString() + ".pcm")
+    private val sdf = SimpleDateFormat("MM-dd_HH-mm-ss")
+
+    private fun createAudioFile() = File(context.filesDir, sdf.format(Date()) + ".pcm")
 
     private var fos: FileOutputStream? = null
 

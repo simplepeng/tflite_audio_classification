@@ -17,7 +17,9 @@ package org.tensorflow.lite.examples.audio
 
 import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
+import com.arthenica.ffmpegkit.FFmpegKit
 import org.tensorflow.lite.examples.audio.databinding.ActivityMainBinding
 
 class MainActivity : AppCompatActivity() {
@@ -27,6 +29,8 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         activityMainBinding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(activityMainBinding.root)
+
+        convertToMp3()
     }
 
     override fun onBackPressed() {
@@ -36,6 +40,14 @@ class MainActivity : AppCompatActivity() {
             finishAfterTransition()
         } else {
             super.onBackPressed()
+        }
+    }
+
+    private fun convertToMp3() {
+        val path = this.filesDir.absolutePath + "/11-07_11-41-49.pcm"
+        val outPath = this.filesDir.absolutePath + "/convet.mp3"
+        FFmpegKit.executeAsync("-y -f f32le -ac 1 -ar 16000 -acodec pcm_f32le -i $path $outPath") { session ->
+            Log.d("simple", "session = $session")
         }
     }
 }
